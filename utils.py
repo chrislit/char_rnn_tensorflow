@@ -1,6 +1,6 @@
 import os
 import collections
-import cPickle
+import pickle
 import numpy as np
 
 class TextLoader():
@@ -14,10 +14,10 @@ class TextLoader():
         tensor_file = os.path.join(data_dir, "data.npy")
 
         if not (os.path.exists(vocab_file) and os.path.exists(tensor_file)):
-            print "reading text file"
+            print("reading text file")
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
-            print "loading preprocessed files"
+            print("loading preprocessed files")
             self.load_preprocessed(vocab_file, tensor_file)
         self.create_batches()
         self.reset_batch_pointer()
@@ -31,13 +31,13 @@ class TextLoader():
         self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
         with open(vocab_file, 'w') as f:
-            cPickle.dump(self.chars, f)
+            pickle.dump(self.chars, f)
         self.tensor = np.array(map(self.vocab.get, data))
         np.save(tensor_file, self.tensor)
 
     def load_preprocessed(self, vocab_file, tensor_file):
         with open(vocab_file) as f:
-            self.chars = cPickle.load(f)
+            self.chars = pickle.load(f)
         self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
         self.tensor = np.load(tensor_file)

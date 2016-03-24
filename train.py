@@ -4,10 +4,10 @@ import tensorflow as tf
 import argparse
 import time
 import os
-import cPickle
+import pickle
 
-from utils import TextLoader
-from model import Model
+from .utils import TextLoader
+from .model import Model
 
 def main():
     parser = argparse.ArgumentParser()
@@ -43,9 +43,9 @@ def train(args):
     args.vocab_size = data_loader.vocab_size
 
     with open(os.path.join(args.save_dir, 'config.pkl'), 'w') as f:
-        cPickle.dump(args, f)
+        pickle.dump(args, f)
     with open(os.path.join(args.save_dir, 'chars_vocab.pkl'), 'w') as f:
-        cPickle.dump((data_loader.chars, data_loader.vocab), f)
+        pickle.dump((data_loader.chars, data_loader.vocab), f)
 
     model = Model(args)
 
@@ -62,14 +62,14 @@ def train(args):
                 feed = {model.input_data: x, model.targets: y, model.initial_state: state}
                 train_loss, state, _ = sess.run([model.cost, model.final_state, model.train_op], feed)
                 end = time.time()
-                print "{}/{} (epoch {}), train_loss = {:.3f}, time/batch = {:.3f}" \
+                print("{}/{} (epoch {}), train_loss = {:.3f}, time/batch = {:.3f}" \
                     .format(e * data_loader.num_batches + b,
                             args.num_epochs * data_loader.num_batches,
-                            e, train_loss, end - start)
+                            e, train_loss, end - start))
                 if (e * data_loader.num_batches + b) % args.save_every == 0:
                     checkpoint_path = os.path.join(args.save_dir, 'model.ckpt')
                     saver.save(sess, checkpoint_path, global_step = e * data_loader.num_batches + b)
-                    print "model saved to {}".format(checkpoint_path)
+                    print("model saved to {}".format(checkpoint_path))
 
 if __name__ == '__main__':
     main()
